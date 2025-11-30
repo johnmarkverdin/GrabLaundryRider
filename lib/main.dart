@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'supabase_config.dart';
-import 'pages/auth_rider_page.dart';   // make sure this path & file name are correct
+import 'pages/auth_rider_page.dart';
 import 'pages/rider_home_page.dart';
+import 'splash_screen.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initSupabase();
   runApp(const RiderApp());
@@ -25,17 +27,17 @@ class _RiderAppState extends State<RiderApp> {
     super.initState();
     _checkSession();
 
-    // listen for login/logout
-    supabase.auth.onAuthStateChange.listen((data) {
-      final session = data.session;
+    // listen to login / logout (same idea as Admin)
+    Supabase.instance.client.auth.onAuthStateChange.listen((event) {
+      if (!mounted) return;
       setState(() {
-        _loggedIn = session != null;
+        _loggedIn = event.session != null;
       });
     });
   }
 
   void _checkSession() {
-    final session = supabase.auth.currentSession;
+    final session = Supabase.instance.client.auth.currentSession;
     setState(() {
       _loggedIn = session != null;
       _checkingSession = false;
@@ -45,7 +47,9 @@ class _RiderAppState extends State<RiderApp> {
   @override
   Widget build(BuildContext context) {
     if (_checkingSession) {
+      // while checking session just show a loader
       return const MaterialApp(
+        debugShowCheckedModeBanner: false,
         home: Scaffold(
           body: Center(child: CircularProgressIndicator()),
         ),
@@ -54,9 +58,18 @@ class _RiderAppState extends State<RiderApp> {
 
     return MaterialApp(
       title: 'GrabLaundry Rider',
-      theme: ThemeData(primarySwatch: Colors.green),
-      // ✅ show Auth when NOT logged in, Home when logged in
-      home: _loggedIn ? const RiderHomePage() : const RiderAuthPage(),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF22C55E)),
+        scaffoldBackgroundColor: const Color(0xFFF3F4F6),
+        useMaterial3: true,
+      ),
+      // ✅ if logged in -> RiderHomePage, else -> RiderAuthPage
+      home: AnimatedSplashScreen(
+        nextScreen: _loggedIn
+            ?  const RiderHomePage()
+            :  const RiderAuthPage(),
+      ),
     );
   }
 }

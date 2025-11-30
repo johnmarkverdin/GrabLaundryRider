@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // 👈 ADD
 import '../supabase_config.dart';
-import '../pages/rider_home_page.dart';
+import 'rider_home_page.dart'; // 👈 IMPORT THE REAL HOME PAGE
 
 class RiderAuthPage extends StatefulWidget {
   const RiderAuthPage({super.key});
@@ -208,17 +208,21 @@ class _RiderAuthPageState extends State<RiderAuthPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Logo / Icon
+                  // Logo / Icon (use app logo)
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.12),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
-                      Icons.directions_bike_rounded,
-                      size: 48,
-                      color: Colors.white,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: Image.asset(
+                        'assets/logo.png',
+                        width: 56,
+                        height: 56,
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -401,9 +405,10 @@ class _RiderAuthPageState extends State<RiderAuthPage> {
                                     ? Icons.visibility
                                     : Icons.visibility_off,
                               ),
-                              onPressed: () => setState(
-                                    () => _showPassword = !_showPassword,
-                              ),
+                              onPressed: () =>
+                                  setState(
+                                        () => _showPassword = !_showPassword,
+                                  ),
                             ),
                           ),
                         ),
@@ -476,16 +481,14 @@ class _RiderAuthPageState extends State<RiderAuthPage> {
                           child: ElevatedButton(
                             onPressed: _auth,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                              const Color(0xFF4F46E5),
+                              backgroundColor: const Color(0xFF4F46E5),
                               foregroundColor: Colors.white,
                               elevation: 0,
                               padding: const EdgeInsets.symmetric(
                                 vertical: 14,
                               ),
                               shape: RoundedRectangleBorder(
-                                borderRadius:
-                                BorderRadius.circular(18),
+                                borderRadius: BorderRadius.circular(18),
                               ),
                             ),
                             child: Text(
